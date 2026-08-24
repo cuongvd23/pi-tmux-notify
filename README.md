@@ -1,5 +1,8 @@
 # pi-tmux-notify
 
+[![CI](https://github.com/cuongvd23/pi-tmux-notify/actions/workflows/ci.yml/badge.svg)](https://github.com/cuongvd23/pi-tmux-notify/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/pi-tmux-notify)](https://www.npmjs.com/package/pi-tmux-notify)
+
 Desktop notifications for [pi](https://pi.dev) in **tmux**: get notified when the agent finishes and waits for input — click the notification to jump back to the tmux pane that fired it.
 
 ## Features
