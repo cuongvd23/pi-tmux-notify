@@ -1,71 +1,51 @@
 # pi-tmux-notify
 
-Desktop notifications for [pi](https://pi.dev) sessions running in **tmux**: when the agent finishes work and waits for your next instruction, you get a notification — and clicking it **returns you to the exact tmux pane** that fired it. Perfect for running many pi instances across panes and windows.
+Desktop notifications for [pi](https://pi.dev) in **tmux**: get notified when the agent finishes and waits for input — click the notification to jump back to the tmux pane that fired it.
 
 ## Features
 
-- 🖱️ **Click the notification badge → land on the firing tmux pane.** Clicking focuses the terminal surface; a one-shot tmux `client-focus-in` hook then switches to the exact session/window/pane.
-- 🧵 Notifications fire even from background panes/windows via tmux DCS passthrough (requires `allow-passthrough all` in your tmux config — the extension warns if missing but never modifies your tmux settings).
-- 🔔 Auto-detects the best-supported terminal notification protocol:
-  - **OSC 99** — Kitty
-  - **OSC 777** — Ghostty, WezTerm, iTerm2, rxvt-unicode
-  - **OSC 9** — fallback (Windows Terminal, ConEmu, foot, …)
-- 🧹 Safe: the focus hook is one-shot and self-removing, disarmed if you type first, and cleaned up on session shutdown. Uses a namespaced hook index (`client-focus-in[777]`) so it won't clobber your own hooks.
+- 🖱️ Click the notification → tmux switches to the firing session/window/pane
+- 🧵 Fires from background panes/windows (via tmux DCS passthrough)
+- 🔔 Auto-detects the notification protocol: OSC 99 (Kitty), OSC 777 (Ghostty, WezTerm, iTerm2), OSC 9 (fallback)
+- 🧹 Never modifies your tmux settings; the only tmux state used is a one-shot, self-removing hook (`client-focus-in[777]`)
 
 ## Install
 
 ```bash
 pi install npm:pi-tmux-notify
-```
-
-Or from git:
-
-```bash
-pi install git:github.com/cuongvd23/pi-tmux-notify
-```
-
-Or try it without installing:
-
-```bash
-pi -e npm:pi-tmux-notify
+# or: pi install git:github.com/cuongvd23/pi-tmux-notify
+# or try it: pi -e npm:pi-tmux-notify
 ```
 
 ## Usage
 
-Works out of the box — a notification fires whenever pi settles (done working, no pending retries/follow-ups) via the `agent_settled` event.
-
-Command:
+Works out of the box — notifies whenever pi settles.
 
 ```
 /pi-tmux-notify              # toggle on/off
 /pi-tmux-notify on|off       # explicit toggle
 /pi-tmux-notify osc777|osc99|osc9|auto   # force a protocol
-/pi-tmux-notify test         # fire a test notification now
+/pi-tmux-notify test         # fire a test notification
 ```
 
 ## Requirements
 
-- **tmux 3.3+** with the following in your tmux config (the extension never changes tmux settings itself; the only tmux state it touches is a one-shot, self-removing `client-focus-in[777]` hook used for pane switching):
+- tmux 3.3+ with:
 
   ```tmux
   set -g allow-passthrough all   # forward notifications from background panes
   set -g focus-events on         # needed for click-to-return
   ```
-- A terminal that supports desktop notifications via OSC (Ghostty, Kitty, WezTerm, iTerm2, Windows Terminal, foot, …)
-- On macOS: notification permission granted to your terminal (System Settings → Notifications)
+- A terminal supporting OSC desktop notifications (Ghostty, Kitty, WezTerm, iTerm2, Windows Terminal, foot, …)
+- macOS: notification permission granted to your terminal
 
-Outside tmux the extension still works in degraded mode: you get the notification and the terminal's native click-to-focus, just without pane-precise return.
-
-Notes:
-
-- Notifications are typically suppressed by the terminal while the emitting surface is focused (that's desirable).
-- Click-to-focus behavior varies by terminal; Ghostty and Kitty focus the emitting window on click. The tmux pane-return works whenever the terminal regains focus.
+Outside tmux you still get notifications and the terminal's native click-to-focus, without pane-precise return.
 
 ## Limitations
 
-- **Clicking a notification cannot target its exact pane when multiple pi instances are pending.** OSC notification protocols carry no identity back on click — the terminal only reports "window focused", the same signal for any badge (or a plain cmd-tab). The extension therefore keeps a single pending target: clicking **any** badge returns you to the **most recent** notifier. With a single pi instance this is always exact.
-- The pane-return hook fires on the terminal's next focus-in, however it happens — refocusing the terminal yourself (without clicking the badge) also triggers the jump. The hook is one-shot, so this happens at most once per notification, and typing into pi first cancels it.
-- Exact per-badge return would require a notifier with real click callbacks (e.g. macOS `terminal-notifier -execute`), which is out of scope to keep this extension dependency-free and portable.
+- OSC clicks carry no identity, so with multiple pending pi instances any click returns to the **most recent** notifier. Exact with a single instance.
+- The pane-return triggers on the terminal's next focus-in — refocusing without clicking also jumps (once; typing into pi first cancels it).
+- Terminals usually suppress notifications while the emitting surface is focused.
 
 ## License
 
