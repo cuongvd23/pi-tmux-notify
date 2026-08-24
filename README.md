@@ -58,6 +58,3 @@ Works out of the box — notifies when `pi` finishes all work (including retries
 - The pane-return triggers on the terminal's next focus-in — refocusing without clicking also jumps (once; typing into pi first cancels it).
 - Terminals usually suppress notifications while the emitting surface is focused.
 
-## License
-
-MIT
