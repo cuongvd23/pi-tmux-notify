@@ -13,8 +13,18 @@ Desktop notifications for [pi](https://pi.dev) in **tmux**: get notified when th
 
 ```bash
 pi install npm:pi-tmux-notify
-# or: pi install git:github.com/cuongvd23/pi-tmux-notify
-# or try it: pi -e npm:pi-tmux-notify
+```
+
+Or from git:
+
+```bash
+pi install git:github.com/cuongvd23/pi-tmux-notify
+```
+
+Or try it without installing:
+
+```bash
+pi -e npm:pi-tmux-notify
 ```
 
 ## Usage
@@ -36,6 +46,7 @@ Works out of the box — notifies whenever pi settles.
   set -g allow-passthrough all   # forward notifications from background panes
   set -g focus-events on         # needed for click-to-return
   ```
+
 - A terminal supporting OSC desktop notifications (Ghostty, Kitty, WezTerm, iTerm2, Windows Terminal, foot, …)
 - macOS: notification permission granted to your terminal
 
