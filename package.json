@@ -1,6 +1,6 @@
 {
   "name": "pi-tmux-notify",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Desktop notifications (OSC 777/99/9) when pi finishes work, with tmux pane-return on notification click",
   "keywords": [
     "pi-package",
