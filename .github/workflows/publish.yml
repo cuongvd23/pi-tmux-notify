@@ -9,7 +9,24 @@ permissions:
   id-token: write # npm provenance
 
 jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Typecheck
+        run: |
+          npm install --no-save typescript @types/node @earendil-works/pi-coding-agent typebox
+          npx tsc --noEmit --strict --skipLibCheck \
+            --target es2022 --module nodenext --moduleResolution nodenext \
+            extensions/index.ts
+
   publish:
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
