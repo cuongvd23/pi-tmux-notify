@@ -29,7 +29,7 @@ pi -e npm:pi-tmux-notify
 
 ## Usage
 
-Works out of the box — notifies whenever pi settles.
+Works out of the box — notifies when `pi` finishes all work (including retries and follow-ups) and is waiting for your input.
 
 ```
 /pi-tmux-notify              # toggle on/off
