@@ -145,24 +145,6 @@ export default function (pi: ExtensionAPI) {
     }
   }
 
-  async function ensurePassthrough(): Promise<void> {
-    if (!inTmux) return
-    try {
-      // Pane-scoped: "all" forwards escapes even when this pane is not visible.
-      // Does not modify the user's global tmux config.
-      await tmux([
-        "set-option",
-        "-p",
-        "-t",
-        process.env.TMUX_PANE!,
-        "allow-passthrough",
-        "all",
-      ])
-    } catch {
-      // ignore; checkPassthrough will warn if unusable
-    }
-  }
-
   async function checkPassthrough(ctx: {
     ui: { notify: (m: string, t: "warning") => void }
   }): Promise<void> {
@@ -178,7 +160,7 @@ export default function (pi: ExtensionAPI) {
       if (!/\ball\b/.test(val)) {
         warnedPassthrough = true
         ctx.ui.notify(
-          "pi-tmux-notify: set tmux 'allow-passthrough all' so notifications work from background panes — tmux set -g allow-passthrough all",
+          "pi-tmux-notify: notifications from background panes need tmux 'allow-passthrough all'. Add to your tmux config: set -g allow-passthrough all",
           "warning"
         )
       }
@@ -240,7 +222,6 @@ export default function (pi: ExtensionAPI) {
       return
     }
     await captureTarget()
-    await ensurePassthrough()
     await checkPassthrough(ctx)
   })
 

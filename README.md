@@ -5,7 +5,7 @@ Desktop notifications for [pi](https://pi.dev) sessions running in **tmux**: whe
 ## Features
 
 - 🖱️ **Click the notification badge → land on the firing tmux pane.** Clicking focuses the terminal surface; a one-shot tmux `client-focus-in` hook then switches to the exact session/window/pane.
-- 🧵 Notifications fire even from background panes/windows: escape sequences are wrapped in tmux DCS passthrough and `allow-passthrough all` is set **pane-scoped** (your tmux config is untouched).
+- 🧵 Notifications fire even from background panes/windows via tmux DCS passthrough (requires `allow-passthrough all` in your tmux config — the extension warns if missing but never modifies your tmux settings).
 - 🔔 Auto-detects the best-supported terminal notification protocol:
   - **OSC 99** — Kitty
   - **OSC 777** — Ghostty, WezTerm, iTerm2, rxvt-unicode
@@ -45,7 +45,12 @@ Command:
 
 ## Requirements
 
-- **tmux 3.3+** (`allow-passthrough` support); pane focus-return needs `focus-events on`
+- **tmux 3.3+** with the following in your tmux config (the extension never changes tmux settings itself; the only tmux state it touches is a one-shot, self-removing `client-focus-in[777]` hook used for pane switching):
+
+  ```tmux
+  set -g allow-passthrough all   # forward notifications from background panes
+  set -g focus-events on         # needed for click-to-return
+  ```
 - A terminal that supports desktop notifications via OSC (Ghostty, Kitty, WezTerm, iTerm2, Windows Terminal, foot, …)
 - On macOS: notification permission granted to your terminal (System Settings → Notifications)
 
