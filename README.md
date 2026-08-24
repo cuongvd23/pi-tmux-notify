@@ -60,7 +60,12 @@ Notes:
 
 - Notifications are typically suppressed by the terminal while the emitting surface is focused (that's desirable).
 - Click-to-focus behavior varies by terminal; Ghostty and Kitty focus the emitting window on click. The tmux pane-return works whenever the terminal regains focus.
-- With multiple pi instances, the most recent notifier owns the focus hook.
+
+## Limitations
+
+- **Clicking a notification cannot target its exact pane when multiple pi instances are pending.** OSC notification protocols carry no identity back on click — the terminal only reports "window focused", the same signal for any badge (or a plain cmd-tab). The extension therefore keeps a single pending target: clicking **any** badge returns you to the **most recent** notifier. With a single pi instance this is always exact.
+- The pane-return hook fires on the terminal's next focus-in, however it happens — refocusing the terminal yourself (without clicking the badge) also triggers the jump. The hook is one-shot, so this happens at most once per notification, and typing into pi first cancels it.
+- Exact per-badge return would require a notifier with real click callbacks (e.g. macOS `terminal-notifier -execute`), which is out of scope to keep this extension dependency-free and portable.
 
 ## License
 
