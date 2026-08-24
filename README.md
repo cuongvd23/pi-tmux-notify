@@ -15,13 +15,19 @@ Desktop notifications for [pi](https://pi.dev) when the agent finishes work and 
 ## Install
 
 ```bash
+pi install npm:pi-tmux-notify
+```
+
+Or from git:
+
+```bash
 pi install git:github.com/cuongvd23/pi-tmux-notify
 ```
 
 Or try it without installing:
 
 ```bash
-pi -e git:github.com/cuongvd23/pi-tmux-notify
+pi -e npm:pi-tmux-notify
 ```
 
 ## Usage
