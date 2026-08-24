@@ -1,6 +1,6 @@
 {
   "name": "pi-tmux-notify",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Desktop notifications (OSC 777/99/9) when pi finishes work, with tmux pane-return on notification click",
   "keywords": [
     "pi-package",
@@ -18,7 +18,9 @@
     "url": "https://github.com/cuongvd23/pi-tmux-notify"
   },
   "pi": {
-    "extensions": ["./extensions"]
+    "extensions": [
+      "./extensions"
+    ]
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
