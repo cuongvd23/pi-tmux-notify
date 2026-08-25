@@ -10,7 +10,7 @@ Desktop notifications for [pi](https://pi.dev) in **tmux**: get notified when th
 - 🖱️ Click the notification → tmux switches to the firing session/window/pane
 - 🧵 Fires from background panes/windows (via tmux DCS passthrough)
 - 🔔 Auto-detects the notification protocol: OSC 99 (Kitty), OSC 777 (Ghostty, WezTerm, iTerm2), OSC 9 (fallback)
-- 🧹 Never modifies your tmux settings; the only tmux state used is a one-shot, self-removing hook (`client-focus-in[777]`)
+- 🧹 Tmux hook `client-focus-in[777]` is used to handle the notification click focus
 
 ## Requirements
 
