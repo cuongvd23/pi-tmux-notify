@@ -51,9 +51,25 @@ Works out of the box — notifies when `pi` finishes all work (including retries
 ```
 /pi-tmux-notify              # toggle on/off
 /pi-tmux-notify on|off       # explicit toggle
-/pi-tmux-notify osc777|osc99|osc9|auto   # force a protocol
+/pi-tmux-notify osc777|osc99|osc9|auto   # force a protocol (persisted)
 /pi-tmux-notify test         # fire a test notification
 ```
+
+## Configuration
+
+The preferred protocol persists across sessions in
+`~/.pi/agent/pi-tmux-notify.json`:
+
+```json
+{
+  "protocol": "osc777"
+}
+```
+
+Setting a protocol via `/pi-tmux-notify osc777` (or `osc99`/`osc9`/`auto`)
+saves it to this file automatically. The file is loaded at session start;
+invalid or missing values fall back to `auto`. Useful when auto-detection
+cannot see the real terminal (e.g. inside tmux, where `TERM_PROGRAM=tmux`).
 
 ## Limitations
 

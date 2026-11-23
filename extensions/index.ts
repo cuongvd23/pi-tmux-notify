@@ -18,11 +18,21 @@
  */
 
 import { execFile } from "node:child_process"
-import { openSync, writeSync, closeSync } from "node:fs"
+import {
+  closeSync,
+  mkdirSync,
+  openSync,
+  readFileSync,
+  writeFileSync,
+  writeSync,
+} from "node:fs"
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
-import { basename } from "node:path"
+import { basename, dirname, join } from "node:path"
+import { homedir } from "node:os"
 
 const HOOK_NAME = "client-focus-in[777]"
+
+const CONFIG_PATH = join(homedir(), ".pi", "agent", "pi-tmux-notify.json")
 
 interface TmuxTarget {
   session: string
@@ -59,6 +69,43 @@ function writeToTty(data: string): void {
 }
 
 type NotifyProtocol = "osc777" | "osc99" | "osc9" | "auto"
+
+/** Settings persisted across sessions in CONFIG_PATH. */
+interface PersistedConfig {
+  /** Preferred notification protocol, loaded at session start. */
+  protocol?: NotifyProtocol
+}
+
+function isNotifyProtocol(value: unknown): value is NotifyProtocol {
+  return (
+    value === "auto" ||
+    value === "osc777" ||
+    value === "osc99" ||
+    value === "osc9"
+  )
+}
+
+function loadPersistedConfig(): PersistedConfig {
+  try {
+    const parsed: unknown = JSON.parse(readFileSync(CONFIG_PATH, "utf8"))
+    if (parsed && typeof parsed === "object") {
+      const raw = parsed as Record<string, unknown>
+      if (isNotifyProtocol(raw.protocol)) return { protocol: raw.protocol }
+    }
+  } catch {
+    // Missing or malformed config — fall back to defaults.
+  }
+  return {}
+}
+
+function savePersistedConfig(config: PersistedConfig): void {
+  try {
+    mkdirSync(dirname(CONFIG_PATH), { recursive: true })
+    writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2) + "\n")
+  } catch {
+    // Persistence is best-effort; notifications still work this session.
+  }
+}
 
 function detectProtocol(): Exclude<NotifyProtocol, "auto"> {
   const term = (process.env.TERM_PROGRAM ?? "").toLowerCase()
@@ -122,11 +169,12 @@ function sendNotification(
 
 export default function (pi: ExtensionAPI) {
   const inTmux = Boolean(process.env.TMUX && process.env.TMUX_PANE)
+  const persisted = loadPersistedConfig()
   let target: TmuxTarget | undefined
   let hookArmed = false
   let warnedPassthrough = false
   let enabled = true
-  let protocol: NotifyProtocol = "auto"
+  let protocol: NotifyProtocol = persisted.protocol ?? "auto"
 
   async function captureTarget(): Promise<void> {
     if (!inTmux) return
@@ -257,8 +305,11 @@ export default function (pi: ExtensionAPI) {
         arg === "osc99" ||
         arg === "osc9" ||
         arg === "auto"
-      )
+      ) {
         protocol = arg
+        persisted.protocol = arg
+        savePersistedConfig(persisted)
+      }
       else if (arg === "test")
         sendNotification(protocol, "pi test", "Test notification")
       else enabled = !enabled
@@ -266,7 +317,7 @@ export default function (pi: ExtensionAPI) {
       const effective =
         protocol === "auto" ? `auto (${detectProtocol()})` : protocol
       ctx.ui.notify(
-        `pi-tmux-notify: ${enabled ? "on" : "off"}, protocol: ${effective}`,
+        `pi-tmux-notify: ${enabled ? "on" : "off"}, protocol: ${effective}${persisted.protocol ? " (persisted)" : ""}`,
         "info"
       )
     },
